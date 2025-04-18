@@ -60,8 +60,8 @@ const HeroSection = () => {
           <div className="relative">
             <div className="relative z-10 bg-white p-3 rounded-xl shadow-lg">
               <img 
-                src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" 
-                alt="GrowIQ Dashboard" 
+                src="/lovable-uploads/42c61cfb-9712-4151-b891-111a232e217f.png" 
+                alt="GrowIQ Student Management Dashboard" 
                 className="w-full h-auto rounded-lg"
               />
             </div>
