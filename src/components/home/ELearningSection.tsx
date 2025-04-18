@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -12,8 +11,8 @@ const ELearningSection = () => {
           <div className="relative order-2 lg:order-1">
             <div className="relative z-10 bg-white p-3 rounded-xl shadow-lg">
               <img 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" 
-                alt="E-Learning Platform" 
+                src="/images/dashboard-preview.png" 
+                alt="E-Learning Dashboard Preview" 
                 className="w-full h-auto rounded-lg"
               />
               
