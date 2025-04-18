@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, Layers, Phone, ChevronDown } from 'lucide-react';
+import { Menu, X, BookOpen, Layers, Phone, ChevronDown, Users, Code, Lightbulb, Heart, School, GraduationCap, Book, Building2, FileText, Video, Briefcase } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,8 +50,119 @@ const Header = () => {
           <Link to="/features" className="text-gray-700 hover:text-growiq-600 font-medium">
             Features
           </Link>
-          <Link to="/pricing" className="text-gray-700 hover:text-growiq-600 font-medium">
-            Pricing
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-gray-700 hover:text-growiq-600 font-medium">
+              Know us <ChevronDown size={16} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Link to="/about" className="flex items-center gap-2 w-full">
+                  <Users size={16} />
+                  About
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/inside-growiq" className="flex items-center gap-2 w-full">
+                  <BookOpen size={16} />
+                  Inside GrowIQ
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/technology-stack" className="flex items-center gap-2 w-full">
+                  <Code size={16} />
+                  Our Technology Stack
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/innovation" className="flex items-center gap-2 w-full">
+                  <Lightbulb size={16} />
+                  Innovation & R&D
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/life-at-growiq" className="flex items-center gap-2 w-full">
+                  <Heart size={16} />
+                  Life as a Developer at GrowIQ
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-gray-700 hover:text-growiq-600 font-medium">
+              Industries We Serve <ChevronDown size={16} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Link to="/industries/schools" className="flex items-center gap-2 w-full">
+                  <School size={16} />
+                  Schools (K-12)
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/industries/colleges" className="flex items-center gap-2 w-full">
+                  <GraduationCap size={16} />
+                  Colleges & Universities
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/industries/coaching" className="flex items-center gap-2 w-full">
+                  <Book size={16} />
+                  Coaching Institutes
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/industries/government" className="flex items-center gap-2 w-full">
+                  <Building2 size={16} />
+                  Government Educational Bodies
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/industries/corporate" className="flex items-center gap-2 w-full">
+                  <Briefcase size={16} />
+                  Corporate Training
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-gray-700 hover:text-growiq-600 font-medium">
+              Resources <ChevronDown size={16} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Link to="/resources/blog" className="flex items-center gap-2 w-full">
+                  <FileText size={16} />
+                  Blog & Insights
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/resources/help" className="flex items-center gap-2 w-full">
+                  <BookOpen size={16} />
+                  Help Center / FAQs
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/resources/docs" className="flex items-center gap-2 w-full">
+                  <FileText size={16} />
+                  Documentation
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/resources/videos" className="flex items-center gap-2 w-full">
+                  <Video size={16} />
+                  Product Videos
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/resources/whitepapers" className="flex items-center gap-2 w-full">
+                  <FileText size={16} />
+                  Whitepapers / eBooks
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Link to="/careers" className="text-gray-700 hover:text-growiq-600 font-medium">
+            Careers
           </Link>
           <Link to="/contact" className="text-gray-700 hover:text-growiq-600 font-medium">
             Contact
@@ -106,8 +216,131 @@ const Header = () => {
             <Link to="/features" className="text-gray-700 font-medium py-2" onClick={toggleMenu}>
               Features
             </Link>
-            <Link to="/pricing" className="text-gray-700 font-medium py-2" onClick={toggleMenu}>
-              Pricing
+            <div className="text-gray-700 font-medium py-2">Know us</div>
+            <Link 
+              to="/about" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Users size={16} />
+              About
+            </Link>
+            <Link 
+              to="/inside-growiq" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <BookOpen size={16} />
+              Inside GrowIQ
+            </Link>
+            <Link 
+              to="/technology-stack" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Code size={16} />
+              Our Technology Stack
+            </Link>
+            <Link 
+              to="/innovation" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Lightbulb size={16} />
+              Innovation & R&D
+            </Link>
+            <Link 
+              to="/life-at-growiq" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Heart size={16} />
+              Life as a Developer at GrowIQ
+            </Link>
+            <div className="text-gray-700 font-medium py-2">Industries We Serve</div>
+            <Link 
+              to="/industries/schools" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <School size={16} />
+              Schools (K-12)
+            </Link>
+            <Link 
+              to="/industries/colleges" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <GraduationCap size={16} />
+              Colleges & Universities
+            </Link>
+            <Link 
+              to="/industries/coaching" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Book size={16} />
+              Coaching Institutes
+            </Link>
+            <Link 
+              to="/industries/government" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Building2 size={16} />
+              Government Educational Bodies
+            </Link>
+            <Link 
+              to="/industries/corporate" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Briefcase size={16} />
+              Corporate Training
+            </Link>
+            <div className="text-gray-700 font-medium py-2">Resources</div>
+            <Link 
+              to="/resources/blog" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <FileText size={16} />
+              Blog & Insights
+            </Link>
+            <Link 
+              to="/resources/help" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <BookOpen size={16} />
+              Help Center / FAQs
+            </Link>
+            <Link 
+              to="/resources/docs" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <FileText size={16} />
+              Documentation
+            </Link>
+            <Link 
+              to="/resources/videos" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <Video size={16} />
+              Product Videos
+            </Link>
+            <Link 
+              to="/resources/whitepapers" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100 flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <FileText size={16} />
+              Whitepapers / eBooks
+            </Link>
+            <Link to="/careers" className="text-gray-700 font-medium py-2" onClick={toggleMenu}>
+              Careers
             </Link>
             <Link to="/contact" className="text-gray-700 font-medium py-2" onClick={toggleMenu}>
               Contact

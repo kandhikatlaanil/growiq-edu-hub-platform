@@ -4,6 +4,7 @@ import Layout from '@/components/layout/Layout';
 import FeatureHero from '@/components/school/FeatureHero';
 import FeatureGrid from '@/components/school/FeatureGrid';
 import DemoSection from '@/components/school/DemoSection';
+import School from '../components/school/school-management';
 
 const SchoolManagement = () => {
   return (
@@ -11,6 +12,7 @@ const SchoolManagement = () => {
       <FeatureHero />
       <FeatureGrid />
       <DemoSection />
+      <School />
     </Layout>
   );
 };
