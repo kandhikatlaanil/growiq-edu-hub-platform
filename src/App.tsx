@@ -11,6 +11,11 @@ import SchoolManagement from "./pages/SchoolManagement";
 import CollegeManagement from "./pages/college-management";
 import ELearning from "./pages/e-learning";
 import NotFound from "./pages/NotFound";
+import About from "./pages/about";
+import InsideGrowIQ from "./pages/inside-growiq";
+import TechnologyStack from "./pages/technology-stack";
+import Innovation from "./pages/innovation";
+import LifeAtGrowIQ from "./pages/life-at-growiq";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +33,11 @@ const App = () => (
           <Route path="/school-management" element={<SchoolManagement />} />
           <Route path="/college-management" element={<CollegeManagement />} />
           <Route path="/e-learning" element={<ELearning />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/inside-growiq" element={<InsideGrowIQ />} />
+          <Route path="/technology-stack" element={<TechnologyStack />} />
+          <Route path="/innovation" element={<Innovation />} />
+          <Route path="/life-at-growiq" element={<LifeAtGrowIQ />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

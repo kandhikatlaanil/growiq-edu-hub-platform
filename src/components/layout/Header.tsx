@@ -45,11 +45,11 @@ const Header = () => {
               <DropdownMenuItem>
                 <Link to="/e-learning" className="w-full">E-Learning Platform</Link>
               </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/features" className="w-full">Features</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link to="/features" className="text-gray-700 hover:text-growiq-600 font-medium">
-            Features
-          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 text-gray-700 hover:text-growiq-600 font-medium">
               Know us <ChevronDown size={16} />
@@ -213,7 +213,11 @@ const Header = () => {
             >
               E-Learning Platform
             </Link>
-            <Link to="/features" className="text-gray-700 font-medium py-2" onClick={toggleMenu}>
+            <Link 
+              to="/features" 
+              className="text-gray-600 font-medium py-2 pl-4 border-l-2 border-gray-100"
+              onClick={toggleMenu}
+            >
               Features
             </Link>
             <div className="text-gray-700 font-medium py-2">Know us</div>
