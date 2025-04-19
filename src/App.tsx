@@ -16,6 +16,13 @@ import InsideGrowIQ from "./pages/inside-growiq";
 import TechnologyStack from "./pages/technology-stack";
 import Innovation from "./pages/innovation";
 import LifeAtGrowIQ from "./pages/life-at-growiq";
+import Schools from "./pages/industries/schools";
+import Colleges from "./pages/industries/colleges";
+import Coaching from "./pages/industries/coaching";
+import Government from "./pages/industries/government";
+import Corporate from "./pages/industries/corporate";
+import Whitepapers from "./pages/resources/whitepapers";
+import Help from "./pages/resources/help";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +45,13 @@ const App = () => (
           <Route path="/technology-stack" element={<TechnologyStack />} />
           <Route path="/innovation" element={<Innovation />} />
           <Route path="/life-at-growiq" element={<LifeAtGrowIQ />} />
+          <Route path="/industries/schools" element={<Schools />} />
+          <Route path="/industries/colleges" element={<Colleges />} />
+          <Route path="/industries/coaching" element={<Coaching />} />
+          <Route path="/industries/government" element={<Government />} />
+          <Route path="/industries/corporate" element={<Corporate />} />
+          <Route path="/resources/whitepapers" element={<Whitepapers />} />
+          <Route path="/resources/help" element={<Help />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
