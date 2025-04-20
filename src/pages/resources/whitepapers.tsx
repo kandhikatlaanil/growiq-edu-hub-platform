@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { FileText, Download, Loader2, BookOpen } from 'lucide-react';
 import Header from '@/components/layout/Header';
@@ -6,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import { marked } from 'marked';
 import { WhitepaperDocument, PDFDownloadButton } from '@/api/generate-pdf';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import { useToast } from '@/hooks/use-toast';
 
 // Define theme colors
 const THEME = {
@@ -48,6 +48,7 @@ const Whitepapers = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
+  const { toast } = useToast();
 
   const generateWhitepaper = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,9 +107,20 @@ const Whitepapers = () => {
       }
 
       setGeneratedContent(content);
+      toast({
+        title: "Whitepaper Generated",
+        description: "Your whitepaper has been successfully generated.",
+        duration: 3000
+      });
     } catch (err: any) {
       console.error('Error:', err);
       setError('Failed to generate whitepaper. Please try again.');
+      toast({
+        title: "Error",
+        description: "Failed to generate whitepaper. Please try again.",
+        variant: "destructive",
+        duration: 3000
+      });
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Document, Page, Text, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 
 // Create styles for PDF content
