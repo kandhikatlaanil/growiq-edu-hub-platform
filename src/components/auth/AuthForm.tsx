@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function AuthForm() {
   const [loading, setLoading] = useState(false);
@@ -13,11 +15,13 @@ export default function AuthForm() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
     try {
       if (isSignUp) {
@@ -30,18 +34,25 @@ export default function AuthForm() {
             },
           },
         });
+        
         if (error) throw error;
         toast.success("Registration successful! Please check your email for verification.");
+        // Automatically switch to sign in mode after successful registration
+        setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+        
         if (error) throw error;
+        toast.success("Sign in successful!");
         navigate("/control-system/dashboard");
       }
     } catch (error: any) {
+      setErrorMessage(error.message);
       toast.error(error.message);
+      console.error("Authentication error:", error);
     } finally {
       setLoading(false);
     }
@@ -58,6 +69,13 @@ export default function AuthForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {errorMessage && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={handleAuth} className="space-y-4">
           {isSignUp && (
             <div className="space-y-2">
@@ -98,6 +116,7 @@ export default function AuthForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
+              minLength={6}
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
@@ -107,7 +126,10 @@ export default function AuthForm() {
             type="button"
             variant="link"
             className="w-full"
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setErrorMessage(null);
+            }}
             disabled={loading}
           >
             {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
