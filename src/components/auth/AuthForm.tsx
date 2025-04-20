@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 export default function AuthForm() {
   const [loading, setLoading] = useState(false);
@@ -105,6 +106,26 @@ export default function AuthForm() {
     }
   };
 
+  const handleAnonymousLogin = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    
+    try {
+      const { error } = await supabase.auth.signInAnonymously();
+      
+      if (error) throw error;
+      
+      toast.success("Logged in anonymously!");
+      navigate("/control-system/dashboard");
+    } catch (error: any) {
+      setErrorMessage("Anonymous login failed. Please try again.");
+      toast.error("Anonymous login failed. Please try again.");
+      console.error("Anonymous login error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
@@ -163,6 +184,19 @@ export default function AuthForm() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
           </Button>
+          
+          <Separator className="my-4" />
+          
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="w-full" 
+            onClick={handleAnonymousLogin}
+            disabled={loading}
+          >
+            Continue as Guest
+          </Button>
+          
           <Button
             type="button"
             variant="link"
