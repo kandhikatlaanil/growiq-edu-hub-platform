@@ -1,18 +1,20 @@
+
 import React, { useState } from 'react';
 import { FileText, Download, Loader2, BookOpen } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { marked } from 'marked';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { WhitepaperDocument, PDFDownloadButton } from '@/api/generate-pdf';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 
 // Define theme colors
 const THEME = {
-  primary: rgb(0.145, 0.388, 0.933),    // #2563eb
-  secondary: rgb(0.31, 0.31, 0.31),     // #4F4F4F
-  accent: rgb(0.933, 0.365, 0.365),     // #ee5d5d
-  text: rgb(0.2, 0.2, 0.2),            // #333333
-  lightText: rgb(0.4, 0.4, 0.4),       // #666666
-  background: rgb(0.98, 0.98, 0.98),   // #fafafa
+  primary: 'rgb(37, 99, 235)',    // #2563eb
+  secondary: 'rgb(79, 79, 79)',    // #4F4F4F
+  accent: 'rgb(238, 93, 93)',      // #ee5d5d
+  text: 'rgb(51, 51, 51)',         // #333333
+  lightText: 'rgb(102, 102, 102)', // #666666
+  background: 'rgb(250, 250, 250)', // #fafafa
 };
 
 const SAMPLE_CONTENT = `# Introduction
@@ -45,13 +47,13 @@ const Whitepapers = () => {
   const [topic, setTopic] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [generatedPdf, setGeneratedPdf] = useState('');
+  const [generatedContent, setGeneratedContent] = useState('');
 
   const generateWhitepaper = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setGeneratedPdf('');
+    setGeneratedContent('');
 
     try {
       let content = '';
@@ -103,213 +105,8 @@ const Whitepapers = () => {
         throw new Error('No content generated');
       }
 
-      // Create PDF with improved formatting
-      try {
-        const pdfDoc = await PDFDocument.create();
-        const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        
-        let currentPage = pdfDoc.addPage([595.276, 841.890]); // A4 size
-        let { width, height } = currentPage.getSize();
-        
-        // Calculate padding (6% of width and height)
-        const horizontalPadding = width * 0.06;
-        const verticalPadding = height * 0.06;
-        const contentWidth = width - (2 * horizontalPadding);
-        
-        let yOffset = height - verticalPadding;
-
-        // Add GrowIQ branding header
-        currentPage.drawRectangle({
-          x: 0,
-          y: height - 100, // Adjusted for smaller padding
-          width: width,
-          height: 100,
-          color: THEME.primary,
-        });
-
-        // Add title with white color for better contrast
-        currentPage.drawText('GrowIQ Whitepaper', {
-          x: horizontalPadding,
-          y: height - 65, // Adjusted position for better spacing
-          size: 28,
-          font: helveticaBold,
-          color: rgb(1, 1, 1),
-        });
-
-        yOffset = height - 140; // Adjusted spacing after header
-
-        // Add topic section with proper padding
-        currentPage.drawRectangle({
-          x: horizontalPadding,
-          y: yOffset - 40,
-          width: contentWidth,
-          height: 50,
-          color: rgb(0.95, 0.95, 0.95),
-        });
-
-        currentPage.drawText(topic, {
-          x: horizontalPadding + 10,
-          y: yOffset - 25,
-          size: 16,
-          font: helveticaBold,
-          color: THEME.primary,
-          maxWidth: contentWidth - 20,
-        });
-
-        yOffset -= 80; // Adjusted spacing after topic
-
-        // Process content sections
-        const sections = content.split('\n#').map(section => section.trim());
-        
-        for (const section of sections) {
-          if (section.length === 0) continue;
-
-          const lines = section.split('\n');
-          const sectionTitle = lines[0].replace(/^#+\s*/, '').trim();
-          
-          // Check if we need a new page
-          if (yOffset < verticalPadding + 100) {
-            currentPage = pdfDoc.addPage([595.276, 841.890]);
-            yOffset = height - verticalPadding;
-          }
-
-          // Draw section header background
-          currentPage.drawRectangle({
-            x: horizontalPadding,
-            y: yOffset - 10,
-            width: contentWidth,
-            height: 40,
-            color: rgb(0.97, 0.97, 1),
-          });
-
-          // Draw section title
-          if (sectionTitle) {
-            currentPage.drawText(sectionTitle, {
-              x: horizontalPadding + 10,
-              y: yOffset + 10,
-              size: 14,
-              font: helveticaBold,
-              color: THEME.primary,
-              maxWidth: contentWidth - 20,
-            });
-          }
-
-          yOffset -= 60; // Increased spacing after section title
-
-          // Draw content
-          for (let i = 1; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (line.length === 0) continue;
-
-            // Check if we need a new page
-            if (yOffset < verticalPadding + 50) {
-              currentPage = pdfDoc.addPage([595.276, 841.890]);
-              yOffset = height - verticalPadding;
-            }
-
-            // Handle bullet points
-            const isListItem = line.startsWith('- ') || line.startsWith('* ');
-            const textToDraw = isListItem ? `  • ${line.substring(2)}` : line;
-            
-            try {
-              // Word wrap for long lines
-              const words = textToDraw.split(' ');
-              let currentLine = '';
-              const maxWidth = contentWidth - 20; // Account for padding
-
-              for (const word of words) {
-                const testLine = currentLine + word + ' ';
-                const textWidth = helvetica.widthOfTextAtSize(testLine, 12);
-
-                if (textWidth > maxWidth) {
-                  if (currentLine.trim()) {
-                    currentPage.drawText(currentLine.trim(), {
-                      x: horizontalPadding + 10,
-                      y: yOffset,
-                      size: 12,
-                      font: helvetica,
-                      color: isListItem ? THEME.secondary : THEME.text,
-                      maxWidth: maxWidth,
-                    });
-                    yOffset -= 20;
-                  }
-                  currentLine = word + ' ';
-
-                  if (yOffset < verticalPadding + 50) {
-                    currentPage = pdfDoc.addPage([595.276, 841.890]);
-                    yOffset = height - verticalPadding;
-                  }
-                } else {
-                  currentLine = testLine;
-                }
-              }
-
-              if (currentLine.trim()) {
-                currentPage.drawText(currentLine.trim(), {
-                  x: horizontalPadding + 10,
-                  y: yOffset,
-                  size: 12,
-                  font: helvetica,
-                  color: isListItem ? THEME.secondary : THEME.text,
-                  maxWidth: maxWidth,
-                });
-                yOffset -= 20;
-              }
-            } catch (textError) {
-              console.error('Error drawing text:', textError);
-              continue;
-            }
-          }
-
-          yOffset -= 30; // Extra space between sections
-        }
-
-        // Add footer to each page
-        const pageCount = pdfDoc.getPageCount();
-        for (let i = 0; i < pageCount; i++) {
-          const page = pdfDoc.getPage(i);
-          const { height } = page.getSize();
-
-          // Add footer background
-          page.drawRectangle({
-            x: 0,
-            y: 0,
-            width: width,
-            height: 40,
-            color: rgb(0.95, 0.95, 0.95),
-          });
-
-          // Add page numbers
-          page.drawText(`Page ${i + 1} of ${pageCount}`, {
-            x: horizontalPadding,
-            y: 15,
-            size: 10,
-            font: helvetica,
-            color: THEME.text,
-          });
-
-          // Add GrowIQ branding
-          page.drawText('Generated by GrowIQ Educational Technology', {
-            x: width - horizontalPadding - 200,
-            y: 15,
-            size: 10,
-            font: helveticaBold,
-            color: THEME.primary,
-          });
-        }
-
-        // Save and display PDF
-        const pdfBytes = await pdfDoc.save();
-        const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        setGeneratedPdf(pdfUrl);
-      } catch (pdfError) {
-        console.error('PDF Generation Error:', pdfError);
-        setError('Failed to generate PDF. Please try again. Error: ' + pdfError.message);
-        throw pdfError;
-      }
-    } catch (err) {
+      setGeneratedContent(content);
+    } catch (err: any) {
       console.error('Error:', err);
       setError('Failed to generate whitepaper. Please try again.');
     } finally {
@@ -384,16 +181,32 @@ const Whitepapers = () => {
                   </div>
                 )}
 
-                {generatedPdf && (
-                  <div className="mt-6">
-                    <a
-                      href={generatedPdf}
-                      download="generated-whitepaper.pdf"
-                      className="inline-flex items-center gap-2 text-accent-600 hover:text-accent-700"
-                    >
-                      <Download className="w-5 h-5" />
-                      Download Generated Whitepaper
-                    </a>
+                {generatedContent && (
+                  <div className="mt-6 space-y-4">
+                    <div className="p-4 bg-white border border-gray-200 rounded-md">
+                      <div dangerouslySetInnerHTML={{ __html: marked(generatedContent) }} />
+                    </div>
+                    <div className="flex justify-end">
+                      <PDFDownloadLink
+                        document={<WhitepaperDocument title={topic || "Generated Whitepaper"} content={generatedContent} />}
+                        fileName={`${topic.toLowerCase().replace(/\s+/g, '-')}-whitepaper.pdf`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-accent-600 text-white rounded-md hover:bg-accent-700"
+                      >
+                        {({ loading }) => 
+                          loading ? (
+                            <span className="flex items-center gap-2">
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Preparing PDF...
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <Download className="w-5 h-5" />
+                              Download PDF
+                            </span>
+                          )
+                        }
+                      </PDFDownloadLink>
+                    </div>
                   </div>
                 )}
               </div>
@@ -441,4 +254,4 @@ const Whitepapers = () => {
   );
 };
 
-export default Whitepapers; 
+export default Whitepapers;

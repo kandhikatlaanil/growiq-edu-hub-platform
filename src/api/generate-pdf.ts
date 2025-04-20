@@ -1,58 +1,68 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { marked } from 'marked';
-import { createPdf } from '@react-pdf/renderer';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+import { Document, Page, Text, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 
-  try {
-    const { content } = req.body;
+// Create styles for PDF content
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    backgroundColor: '#FFFFFF',
+    padding: 30,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  content: {
+    fontSize: 12,
+    lineHeight: 1.5,
+    marginBottom: 10,
+  },
+  section: {
+    marginBottom: 20,
+  },
+});
 
-    if (!content) {
-      return res.status(400).json({ error: 'Content is required' });
-    }
+// Create a PDF Document component
+export const WhitepaperDocument = ({ title, content }: { title: string; content: string }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.header}>{title}</Text>
+      <Text style={styles.content}>{content}</Text>
+    </Page>
+  </Document>
+);
 
-    // Convert markdown to HTML
-    const html = marked(content);
+// Function to convert markdown to plaintext (simplified version)
+export const markdownToPlaintext = (markdown: string): string => {
+  // Remove headers (#)
+  let plaintext = markdown.replace(/#{1,6}\s+/g, '');
+  
+  // Remove bullet points
+  plaintext = plaintext.replace(/[*-]\s+/g, '• ');
+  
+  // Remove other markdown formatting like ** for bold, * for italic, etc.
+  plaintext = plaintext.replace(/\*\*(.*?)\*\*/g, '$1');
+  plaintext = plaintext.replace(/\*(.*?)\*/g, '$1');
+  
+  return plaintext;
+};
 
-    // Create PDF document
-    const pdfDoc = createPdf({
-      content: [
-        {
-          text: 'Generated Whitepaper',
-          style: 'header'
-        },
-        {
-          text: html,
-          style: 'content'
-        }
-      ],
-      styles: {
-        header: {
-          fontSize: 24,
-          bold: true,
-          margin: [0, 0, 0, 20]
-        },
-        content: {
-          fontSize: 12,
-          lineHeight: 1.5
-        }
-      }
-    });
-
-    // Generate PDF buffer
-    const pdfBuffer = await pdfDoc.buffer();
-
-    // Set response headers
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=generated-whitepaper.pdf');
-
-    // Send PDF buffer
-    res.send(pdfBuffer);
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    res.status(500).json({ error: 'Failed to generate PDF' });
-  }
-} 
+// Export the PDF download link component
+export const PDFDownloadButton = ({ 
+  filename, 
+  title, 
+  content 
+}: { 
+  filename: string; 
+  title: string; 
+  content: string;
+}) => (
+  <PDFDownloadLink 
+    document={<WhitepaperDocument title={title} content={markdownToPlaintext(content)} />} 
+    fileName={filename}
+  >
+    {({ loading }) => (loading ? 'Preparing document...' : 'Download PDF')}
+  </PDFDownloadLink>
+);
