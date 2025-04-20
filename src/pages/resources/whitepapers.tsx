@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { FileText, Download, Loader2, BookOpen } from 'lucide-react';
 import Header from '@/components/layout/Header';
@@ -6,6 +7,7 @@ import { marked } from 'marked';
 import { WhitepaperDocument, PDFDownloadButton } from '@/api/generate-pdf';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 // Define theme colors
 const THEME = {
@@ -168,10 +170,10 @@ const Whitepapers = () => {
                       required
                     />
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-accent-600 text-white py-2 px-4 rounded-md hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-accent-600 text-white"
                   >
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -184,7 +186,7 @@ const Whitepapers = () => {
                         Generate Whitepaper
                       </span>
                     )}
-                  </button>
+                  </Button>
                 </form>
 
                 {error && (
