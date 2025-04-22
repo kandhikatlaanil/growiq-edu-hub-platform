@@ -3,9 +3,8 @@ import { FileText, Download, Loader2, BookOpen } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { marked } from 'marked';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { downloadPdf } from '@/api/generate-pdf';
 
-// Define theme colors
 const THEME = {
   primary: rgb(0.145, 0.388, 0.933),    // #2563eb
   secondary: rgb(0.31, 0.31, 0.31),     // #4F4F4F
@@ -103,212 +102,13 @@ const Whitepapers = () => {
         throw new Error('No content generated');
       }
 
-      // Create PDF with improved formatting
-      try {
-        const pdfDoc = await PDFDocument.create();
-        const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        
-        let currentPage = pdfDoc.addPage([595.276, 841.890]); // A4 size
-        let { width, height } = currentPage.getSize();
-        
-        // Calculate padding (6% of width and height)
-        const horizontalPadding = width * 0.06;
-        const verticalPadding = height * 0.06;
-        const contentWidth = width - (2 * horizontalPadding);
-        
-        let yOffset = height - verticalPadding;
-
-        // Add GrowIQ branding header
-        currentPage.drawRectangle({
-          x: 0,
-          y: height - 100, // Adjusted for smaller padding
-          width: width,
-          height: 100,
-          color: THEME.primary,
-        });
-
-        // Add title with white color for better contrast
-        currentPage.drawText('GrowIQ Whitepaper', {
-          x: horizontalPadding,
-          y: height - 65, // Adjusted position for better spacing
-          size: 28,
-          font: helveticaBold,
-          color: rgb(1, 1, 1),
-        });
-
-        yOffset = height - 140; // Adjusted spacing after header
-
-        // Add topic section with proper padding
-        currentPage.drawRectangle({
-          x: horizontalPadding,
-          y: yOffset - 40,
-          width: contentWidth,
-          height: 50,
-          color: rgb(0.95, 0.95, 0.95),
-        });
-
-        currentPage.drawText(topic, {
-          x: horizontalPadding + 10,
-          y: yOffset - 25,
-          size: 16,
-          font: helveticaBold,
-          color: THEME.primary,
-          maxWidth: contentWidth - 20,
-        });
-
-        yOffset -= 80; // Adjusted spacing after topic
-
-        // Process content sections
-        const sections = content.split('\n#').map(section => section.trim());
-        
-        for (const section of sections) {
-          if (section.length === 0) continue;
-
-          const lines = section.split('\n');
-          const sectionTitle = lines[0].replace(/^#+\s*/, '').trim();
-          
-          // Check if we need a new page
-          if (yOffset < verticalPadding + 100) {
-            currentPage = pdfDoc.addPage([595.276, 841.890]);
-            yOffset = height - verticalPadding;
-          }
-
-          // Draw section header background
-          currentPage.drawRectangle({
-            x: horizontalPadding,
-            y: yOffset - 10,
-            width: contentWidth,
-            height: 40,
-            color: rgb(0.97, 0.97, 1),
-          });
-
-          // Draw section title
-          if (sectionTitle) {
-            currentPage.drawText(sectionTitle, {
-              x: horizontalPadding + 10,
-              y: yOffset + 10,
-              size: 14,
-              font: helveticaBold,
-              color: THEME.primary,
-              maxWidth: contentWidth - 20,
-            });
-          }
-
-          yOffset -= 60; // Increased spacing after section title
-
-          // Draw content
-          for (let i = 1; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (line.length === 0) continue;
-
-            // Check if we need a new page
-            if (yOffset < verticalPadding + 50) {
-              currentPage = pdfDoc.addPage([595.276, 841.890]);
-              yOffset = height - verticalPadding;
-            }
-
-            // Handle bullet points
-            const isListItem = line.startsWith('- ') || line.startsWith('* ');
-            const textToDraw = isListItem ? `  • ${line.substring(2)}` : line;
-            
-            try {
-              // Word wrap for long lines
-              const words = textToDraw.split(' ');
-              let currentLine = '';
-              const maxWidth = contentWidth - 20; // Account for padding
-
-              for (const word of words) {
-                const testLine = currentLine + word + ' ';
-                const textWidth = helvetica.widthOfTextAtSize(testLine, 12);
-
-                if (textWidth > maxWidth) {
-                  if (currentLine.trim()) {
-                    currentPage.drawText(currentLine.trim(), {
-                      x: horizontalPadding + 10,
-                      y: yOffset,
-                      size: 12,
-                      font: helvetica,
-                      color: isListItem ? THEME.secondary : THEME.text,
-                      maxWidth: maxWidth,
-                    });
-                    yOffset -= 20;
-                  }
-                  currentLine = word + ' ';
-
-                  if (yOffset < verticalPadding + 50) {
-                    currentPage = pdfDoc.addPage([595.276, 841.890]);
-                    yOffset = height - verticalPadding;
-                  }
-                } else {
-                  currentLine = testLine;
-                }
-              }
-
-              if (currentLine.trim()) {
-                currentPage.drawText(currentLine.trim(), {
-                  x: horizontalPadding + 10,
-                  y: yOffset,
-                  size: 12,
-                  font: helvetica,
-                  color: isListItem ? THEME.secondary : THEME.text,
-                  maxWidth: maxWidth,
-                });
-                yOffset -= 20;
-              }
-            } catch (textError) {
-              console.error('Error drawing text:', textError);
-              continue;
-            }
-          }
-
-          yOffset -= 30; // Extra space between sections
-        }
-
-        // Add footer to each page
-        const pageCount = pdfDoc.getPageCount();
-        for (let i = 0; i < pageCount; i++) {
-          const page = pdfDoc.getPage(i);
-          const { height } = page.getSize();
-
-          // Add footer background
-          page.drawRectangle({
-            x: 0,
-            y: 0,
-            width: width,
-            height: 40,
-            color: rgb(0.95, 0.95, 0.95),
-          });
-
-          // Add page numbers
-          page.drawText(`Page ${i + 1} of ${pageCount}`, {
-            x: horizontalPadding,
-            y: 15,
-            size: 10,
-            font: helvetica,
-            color: THEME.text,
-          });
-
-          // Add GrowIQ branding
-          page.drawText('Generated by GrowIQ Educational Technology', {
-            x: width - horizontalPadding - 200,
-            y: 15,
-            size: 10,
-            font: helveticaBold,
-            color: THEME.primary,
-          });
-        }
-
-        // Save and display PDF
-        const pdfBytes = await pdfDoc.save();
-        const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        setGeneratedPdf(pdfUrl);
-      } catch (pdfError) {
-        console.error('PDF Generation Error:', pdfError);
-        setError('Failed to generate PDF. Please try again. Error: ' + pdfError.message);
-        throw pdfError;
-      }
+      // Generate PDF using our client-side function
+      await downloadPdf(content, `${topic.toLowerCase().replace(/\s+/g, '-')}-whitepaper.pdf`);
+      
+      // Create a temporary URL for preview (optional)
+      const pdfUrl = URL.createObjectURL(await downloadPdf(content) as Blob);
+      setGeneratedPdf(pdfUrl);
+      
     } catch (err) {
       console.error('Error:', err);
       setError('Failed to generate whitepaper. Please try again.');
@@ -441,4 +241,4 @@ const Whitepapers = () => {
   );
 };
 
-export default Whitepapers; 
+export default Whitepapers;

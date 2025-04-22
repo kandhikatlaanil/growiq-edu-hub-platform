@@ -1,58 +1,69 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+
 import { marked } from 'marked';
-import { createPdf } from '@react-pdf/renderer';
+import { Document, Page, Text, StyleSheet, pdf } from '@react-pdf/renderer';
+import { PDFDocument } from 'pdf-lib';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+// Define styles for PDF
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    backgroundColor: '#FFFFFF',
+    padding: 40,
+  },
+  header: {
+    fontSize: 24,
+    marginBottom: 20,
+    fontWeight: 'bold',
+  },
+  content: {
+    fontSize: 12,
+    lineHeight: 1.5,
+  },
+});
 
+// Create the PDF document component
+const PdfDocument = ({ content }: { content: string }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.header}>Generated Whitepaper</Text>
+      <Text style={styles.content}>{content}</Text>
+    </Page>
+  </Document>
+);
+
+// Generate PDF function for client-side use
+export const generatePdf = async (content: string): Promise<Blob> => {
   try {
-    const { content } = req.body;
-
-    if (!content) {
-      return res.status(400).json({ error: 'Content is required' });
-    }
-
-    // Convert markdown to HTML
+    // Convert markdown to plain text (removing HTML tags)
     const html = marked(content);
+    const plainText = html.replace(/<[^>]*>?/gm, '');
 
-    // Create PDF document
-    const pdfDoc = createPdf({
-      content: [
-        {
-          text: 'Generated Whitepaper',
-          style: 'header'
-        },
-        {
-          text: html,
-          style: 'content'
-        }
-      ],
-      styles: {
-        header: {
-          fontSize: 24,
-          bold: true,
-          margin: [0, 0, 0, 20]
-        },
-        content: {
-          fontSize: 12,
-          lineHeight: 1.5
-        }
-      }
-    });
-
-    // Generate PDF buffer
-    const pdfBuffer = await pdfDoc.buffer();
-
-    // Set response headers
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=generated-whitepaper.pdf');
-
-    // Send PDF buffer
-    res.send(pdfBuffer);
+    // Create the PDF
+    const pdfDoc = <PdfDocument content={plainText} />;
+    const pdfBlob = await pdf(pdfDoc).toBlob();
+    return pdfBlob;
   } catch (error) {
     console.error('Error generating PDF:', error);
-    res.status(500).json({ error: 'Failed to generate PDF' });
+    throw new Error('Failed to generate PDF');
   }
-} 
+};
+
+// Generate PDF function for downloading
+export const downloadPdf = async (content: string, filename = 'generated-whitepaper.pdf'): Promise<void> => {
+  try {
+    const pdfBlob = await generatePdf(content);
+    
+    // Create download link
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    
+    // Clean up
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error downloading PDF:', error);
+    throw new Error('Failed to download PDF');
+  }
+};
