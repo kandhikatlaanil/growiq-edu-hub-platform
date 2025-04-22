@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { FileText, Download, Loader2, BookOpen } from 'lucide-react';
 import Header from '@/components/layout/Header';
@@ -106,10 +107,11 @@ const Whitepapers = () => {
       await downloadPdf(content, `${topic.toLowerCase().replace(/\s+/g, '-')}-whitepaper.pdf`);
       
       // Create a temporary URL for preview (optional)
-      const pdfUrl = URL.createObjectURL(await downloadPdf(content) as Blob);
+      const blob = await generatePdf(content);  
+      const pdfUrl = URL.createObjectURL(blob);
       setGeneratedPdf(pdfUrl);
       
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error:', err);
       setError('Failed to generate whitepaper. Please try again.');
     } finally {
