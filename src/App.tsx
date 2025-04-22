@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +24,16 @@ import Government from "./pages/industries/government";
 import Corporate from "./pages/industries/corporate";
 import Whitepapers from "./pages/resources/whitepapers";
 import Help from "./pages/resources/help";
+import ControlSystem from "./pages/control-system/ControlSystem";
+import ClientManagement from "./pages/control-system/ClientManagement";
+import ProductSetup from "./pages/control-system/ProductSetup";
+import Automation from "./pages/control-system/Automation";
+import Billing from "./pages/control-system/Billing";
+import Communication from "./pages/control-system/Communication";
+import Ticketing from "./pages/control-system/Ticketing";
+import AdminDashboard from "./pages/control-system/AdminDashboard";
+import Login from "./pages/control-system/Login";
+import Register from "./pages/control-system/Register";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +63,19 @@ const App = () => (
           <Route path="/industries/corporate" element={<Corporate />} />
           <Route path="/resources/whitepapers" element={<Whitepapers />} />
           <Route path="/resources/help" element={<Help />} />
+          
+          {/* Control System Routes */}
+          <Route path="/control-system" element={<ControlSystem />} />
+          <Route path="/control-system/login" element={<Login />} />
+          <Route path="/control-system/register" element={<Register />} />
+          <Route path="/control-system/clients" element={<ClientManagement />} />
+          <Route path="/control-system/products" element={<ProductSetup />} />
+          <Route path="/control-system/automation" element={<Automation />} />
+          <Route path="/control-system/billing" element={<Billing />} />
+          <Route path="/control-system/communication" element={<Communication />} />
+          <Route path="/control-system/tickets" element={<Ticketing />} />
+          <Route path="/control-system/admin" element={<AdminDashboard />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
