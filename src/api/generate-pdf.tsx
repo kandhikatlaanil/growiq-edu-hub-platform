@@ -37,7 +37,8 @@ export const generatePdf = async (content: string): Promise<Blob> => {
   try {
     // Convert markdown to plain text (removing HTML tags)
     const html = marked(content);
-    const plainText = html.replace(/<[^>]*>?/gm, '');
+    // Ensure html is a string before using replace
+    const plainText = typeof html === 'string' ? html.replace(/<[^>]*>?/gm, '') : String(html);
 
     // Create the PDF
     const pdfDoc = <PdfDocument content={plainText} />;

@@ -1,18 +1,17 @@
-
 import React, { useState } from 'react';
 import { FileText, Download, Loader2, BookOpen } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { marked } from 'marked';
-import { downloadPdf } from '@/api/generate-pdf';
+import { downloadPdf, generatePdf } from '@/api/generate-pdf';
 
 const THEME = {
-  primary: rgb(0.145, 0.388, 0.933),    // #2563eb
-  secondary: rgb(0.31, 0.31, 0.31),     // #4F4F4F
-  accent: rgb(0.933, 0.365, 0.365),     // #ee5d5d
-  text: rgb(0.2, 0.2, 0.2),            // #333333
-  lightText: rgb(0.4, 0.4, 0.4),       // #666666
-  background: rgb(0.98, 0.98, 0.98),   // #fafafa
+  primary: '#2563eb',
+  secondary: '#4F4F4F',
+  accent: '#ee5d5d',
+  text: '#333333',
+  lightText: '#666666',
+  background: '#fafafa',
 };
 
 const SAMPLE_CONTENT = `# Introduction
@@ -57,7 +56,6 @@ const Whitepapers = () => {
       let content = '';
       
       try {
-        // Generate content using Deepseek API
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -91,7 +89,6 @@ const Whitepapers = () => {
           throw new Error('Invalid response format from API');
         }
 
-        // Remove any emojis from the generated content
         content = data.choices[0].message.content.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
       } catch (apiError: any) {
         console.error('API Error:', apiError);
@@ -103,10 +100,8 @@ const Whitepapers = () => {
         throw new Error('No content generated');
       }
 
-      // Generate PDF using our client-side function
       await downloadPdf(content, `${topic.toLowerCase().replace(/\s+/g, '-')}-whitepaper.pdf`);
       
-      // Create a temporary URL for preview (optional)
       const blob = await generatePdf(content);  
       const pdfUrl = URL.createObjectURL(blob);
       setGeneratedPdf(pdfUrl);
@@ -123,7 +118,6 @@ const Whitepapers = () => {
     <>
       <Header />
       <div className="min-h-screen bg-gray-50">
-        {/* Hero Section */}
         <section className="py-20 bg-gradient-to-r from-accent-600 to-growiq-600">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center text-white">
@@ -137,7 +131,6 @@ const Whitepapers = () => {
           </div>
         </section>
 
-        {/* Generator Section */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
@@ -203,7 +196,6 @@ const Whitepapers = () => {
           </div>
         </section>
 
-        {/* Features Section */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
