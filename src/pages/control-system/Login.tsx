@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,17 +9,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/sonner";
 import AuthLayout from "@/components/control-system/AuthLayout";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(1, "Password is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get the redirect path from location state or default to dashboard
+  const from = (location.state as any)?.from || "/control-system/admin";
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -33,18 +38,22 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Sign in with Supabase
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
       
-      // Mock login - in a real app, you would authenticate with your backend
-      console.log("Login attempt:", data);
+      if (error) {
+        throw error;
+      }
       
       // Successful login
       toast.success("Login successful!");
-      navigate("/control-system/admin");
-    } catch (error) {
+      navigate(from);
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("Login failed. Please check your credentials and try again.");
+      toast.error(error.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
@@ -52,11 +61,11 @@ const Login = () => {
 
   return (
     <AuthLayout 
-      title="Welcome Back" 
-      subtitle="Login to access your control system"
+      title="Login to Control System" 
+      subtitle="Enter your credentials to access the dashboard"
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
             name="email"

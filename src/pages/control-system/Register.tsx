@@ -9,6 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/sonner";
 import AuthLayout from "@/components/control-system/AuthLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -16,6 +18,7 @@ const formSchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string().min(8, "Please confirm your password"),
+  role: z.enum(["admin", "case_team", "accounts_team", "technician", "client"])
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -35,6 +38,7 @@ const Register = () => {
       companyName: "",
       password: "",
       confirmPassword: "",
+      role: "client"
     },
   });
 
@@ -42,18 +46,29 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Register with Supabase
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.fullName,
+            company_name: data.companyName,
+            role: data.role
+          }
+        }
+      });
       
-      // Mock registration - in a real app, you would register with your backend
-      console.log("Registration attempt:", data);
+      if (authError) {
+        throw authError;
+      }
       
       // Successful registration
       toast.success("Registration successful! You can now log in.");
       navigate("/control-system/login");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
-      toast.error("Registration failed. Please try again later.");
+      toast.error(error.message || "Registration failed. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +118,34 @@ const Register = () => {
                 <FormControl>
                   <Input placeholder="Your Company" {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Role</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a role" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="admin">Administrator</SelectItem>
+                    <SelectItem value="case_team">Case Team</SelectItem>
+                    <SelectItem value="accounts_team">Accounts Team</SelectItem>
+                    <SelectItem value="technician">Technician</SelectItem>
+                    <SelectItem value="client">Client</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
