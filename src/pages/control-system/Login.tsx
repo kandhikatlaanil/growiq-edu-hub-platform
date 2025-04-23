@@ -22,6 +22,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   // Get the redirect path from location state or default to dashboard
   const from = (location.state as any)?.from || "/control-system/admin";
@@ -36,8 +37,11 @@ const Login = () => {
 
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
+    setLoginError(null);
     
     try {
+      console.log("Attempting to sign in with:", data.email);
+      
       // Sign in with Supabase
       const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
@@ -45,14 +49,18 @@ const Login = () => {
       });
       
       if (error) {
+        console.error("Login error:", error);
         throw error;
       }
+      
+      console.log("Login successful, auth data:", authData);
       
       // Successful login
       toast.success("Login successful!");
       navigate(from);
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.error("Login error details:", error);
+      setLoginError(error.message || "Login failed. Please check your credentials.");
       toast.error(error.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
@@ -93,6 +101,10 @@ const Login = () => {
               </FormItem>
             )}
           />
+          
+          {loginError && (
+            <div className="text-sm font-medium text-destructive">{loginError}</div>
+          )}
           
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Logging in..." : "Login"}

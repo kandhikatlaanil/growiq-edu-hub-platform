@@ -29,6 +29,7 @@ type FormValues = z.infer<typeof formSchema>;
 const Register = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [registerError, setRegisterError] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -44,8 +45,16 @@ const Register = () => {
 
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
+    setRegisterError(null);
     
     try {
+      console.log("Registration data:", {
+        email: data.email,
+        role: data.role,
+        fullName: data.fullName,
+        companyName: data.companyName
+      });
+      
       // Register with Supabase
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
@@ -60,14 +69,18 @@ const Register = () => {
       });
       
       if (authError) {
+        console.error("Registration auth error:", authError);
         throw authError;
       }
+      
+      console.log("Registration successful, auth data:", authData);
       
       // Successful registration
       toast.success("Registration successful! You can now log in.");
       navigate("/control-system/login");
     } catch (error: any) {
-      console.error("Registration error:", error);
+      console.error("Registration error details:", error);
+      setRegisterError(error.message || "Registration failed. Please try again later.");
       toast.error(error.message || "Registration failed. Please try again later.");
     } finally {
       setIsLoading(false);
@@ -178,6 +191,10 @@ const Register = () => {
               </FormItem>
             )}
           />
+          
+          {registerError && (
+            <div className="text-sm font-medium text-destructive">{registerError}</div>
+          )}
           
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Creating account..." : "Register"}
